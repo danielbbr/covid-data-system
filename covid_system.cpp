@@ -2,7 +2,6 @@
 #include <string>   
 #include <fstream>
 #include <vector>
-#include <algorithm>
 using namespace std;
 
 class Info {
@@ -55,7 +54,8 @@ class Info {
 class Region {
     private:
         string name;
-        Info info;
+        vector <State> state;
+        vector <Info> info;
     public:
         string get_region_name() { return name; }
         Region(string name, Info info): name(name), info(info) {}
@@ -67,7 +67,8 @@ class State {
         Region region;
         int uf;
         string name;
-        Info info;
+        vector <County> county;
+        vector <Info> info;
     public:
         int get_state_uf() { return uf; }
         string get_state_name() { return name; }
@@ -81,7 +82,7 @@ class County {
         State state;
         string name;
         int codmun;
-        Info info;
+        vector <Info> info;
     public:
         State get_county_state() { return state; }
         string get_county_name() { return name; }
@@ -93,8 +94,6 @@ class County {
 class System {
     private:
         vector <Region> region;
-        vector <State> state;
-        vector <County> county;
     public:
         System (string line){
             string region_aux, state_aux, county_aux;
@@ -105,21 +104,22 @@ class System {
             try{ coduf = stoi(textUntilDivision(line,1)); }catch(...){ coduf = 0; }
             try{ codmun = stoi(textUntilDivision(line,1)); }catch(...){ codmun = 0; }
 
-            if (state_aux == "") // Adiciona região e sua Info no vector region
+            // Acha a região correspondente
+            int it_region;
+            for(it_region=0;it_region<region.size();it_region++)
+                if(region[it_region].get_region_name() == Region(region_aux).get_region_name())
+                    break;
+
+            if(it_region == region.size()){
                 region.push_back(Region(region_aux, lineToInfo(line,0)));
+                it_region = region.size()-1;
+            }
+
+            if (state_aux == "") { // Adiciona região e sua Info no vector region
+                region.push_back(Region(region_aux, lineToInfo(line,0)));
+
+            }    
             else {
-                
-                // Acha a região correspondente
-                int it_region;
-                for(it_region=0;it_region<region.size();it_region++)
-                    if(region[it_region].get_region_name() == Region(region_aux).get_region_name())
-                        break;
-
-                if(it_region == region.size()){
-                    region.push_back(Region(region_aux, lineToInfo(line,0)));
-                    it_region = region.size()-1;
-                }
-
                 if (county_aux == ""){
                     state.push_back(State(coduf, state_aux, region[it_region], lineToInfo(line,1)));
                 }
@@ -131,7 +131,7 @@ class System {
                             break;
 
                     if(it_state == state.size()){
-                        state.push_back(State(coduf, state_aux, region[it_region], lineToInfo(line,0)));
+                        state.push_back(State(coduf, state_aux, region[it_region], lineToInfo(line,1)));
                         it_state = state.size()-1;
                     }
 
