@@ -2,10 +2,16 @@
 #include <string>   
 #include <fstream>
 #include <vector>
+#include <ctime>
+
 using namespace std;
 
+class Region;
+class State;
+class County;
+
 class Info {
-    private:
+    public:
         string nomeRegiaoSaude, data;
 
         int tipo,
@@ -19,7 +25,7 @@ class Info {
         Recuperadosnovos, 
         emAcompanhamentoNovos,
         interior_metropolitana;
-    public:
+    
         // Construtor para Region e State
         Info (int tipo, string data, int semanaEpi, int populacaoTCU2019, int casosAcumulado, int casosNovos, 
             int obitosAcumulado, int obitosNovos, int Recuperadosnovos, int emAcompanhamentoNovos) 
@@ -51,106 +57,56 @@ class Info {
             emAcompanhamentoNovos(0), interior_metropolitana(-1) {}
 };
 
-class Region {
+class Region { // Classe das Regiões
     private:
         string name;
+    public:
         vector <State> state;
         vector <Info> info;
-    public:
         string get_region_name() { return name; }
-        Region(string name, Info info): name(name), info(info) {}
-        Region(string name): name(name), info(0) {}
+        Region(string name): name(name) {}
 };
 
-class State {
+class State { // Classe dos Estados
     private:
-        Region region;
         int uf;
         string name;
+    public:
         vector <County> county;
         vector <Info> info;
-    public:
         int get_state_uf() { return uf; }
         string get_state_name() { return name; }
-        Region get_state_region() { return region; }
-        State (int uf, string name, Region region, Info info): uf(uf), name(name), region(region), info(info) {}
-        State (int uf, string name, Region region): uf(uf), name(name), region(region), info(1) {}
+        State (int uf, string name): uf(uf), name(name) {}
 };
 
-class County {
+class County { // Classe dos Municípios
     private:
-        State state;
         string name;
         int codmun;
-        vector <Info> info;
     public:
-        State get_county_state() { return state; }
+        vector <Info> info;
         string get_county_name() { return name; }
-        County (State state, string name, int codmun, Info info)
-        : state(state), name(name), codmun(codmun), info(info) {}
+        County (string name, int codmun)
+        : name(name), codmun(codmun) {}
 };
 
 // Classe que vai gerir todo o sistema
 class System {
-    private:
-        vector <Region> region;
+    protected:
+        bool isEnd = false;
     public:
-        System (string line){
-            string region_aux, state_aux, county_aux;
-            int coduf, codmun;
-            region_aux = textUntilDivision(line,1);
-            state_aux = textUntilDivision(line,1);
-            county_aux = textUntilDivision(line,1);
-            try{ coduf = stoi(textUntilDivision(line,1)); }catch(...){ coduf = 0; }
-            try{ codmun = stoi(textUntilDivision(line,1)); }catch(...){ codmun = 0; }
-
-            // Acha a região correspondente
-            int it_region;
-            for(it_region=0;it_region<region.size();it_region++)
-                if(region[it_region].get_region_name() == Region(region_aux).get_region_name())
-                    break;
-
-            if(it_region == region.size()){
-                region.push_back(Region(region_aux, lineToInfo(line,0)));
-                it_region = region.size()-1;
-            }
-
-            if (state_aux == "") { // Adiciona região e sua Info no vector region
-                region.push_back(Region(region_aux, lineToInfo(line,0)));
-
-            }    
-            else {
-                if (county_aux == ""){
-                    state.push_back(State(coduf, state_aux, region[it_region], lineToInfo(line,1)));
-                }
-                else {
-                    // Acha o estado correspondente
-                    int it_state;
-                    for(it_state=0;it_state<state.size();it_state++)
-                        if(state[it_state].get_state_name() == State(coduf, state_aux, region[it_region]).get_state_name())
-                            break;
-
-                    if(it_state == state.size()){
-                        state.push_back(State(coduf, state_aux, region[it_region], lineToInfo(line,1)));
-                        it_state = state.size()-1;
-                    }
-
-                    County(state[it_state], county_aux, codmun, lineToInfo(line,2));
-                }
-            }
-        }
-
+        vector <Region> region;
         // Método que retorna a string antes do ';' ou do '\n'
         string textUntilDivision (string& line, int deleteText){ 
             string text = "";
             int i=0;
             
-            cout << "linha:" << line << endl;
             // Passa os valores até antes da divisão
             while (line[i]!=';' && line[i]!='\n' && line[i]!='\0'){
-                text[i]=line[i];
+                text+=line[i];
                 i++;
             }
+
             // Apaga a parte da linha até o ';' (incluso)
             if (deleteText){
                 int aux;
@@ -164,8 +120,9 @@ class System {
                                 
             return text;
         }
-
-        Info lineToInfo (string line, int tipo){
+        
+        // Passa uma string (linha do csv) para Info (classe dos dados)
+        Info lineToInfo (string line, int tipo){ 
             string nomeRegiaoSaude, data;
 
             int codRegiaoSaude,
@@ -195,26 +152,228 @@ class System {
             return Info(tipo, nomeRegiaoSaude, data, codRegiaoSaude, semanaEpi, populacaoTCU2019, casosAcumulado, 
             casosNovos, obitosAcumulado, obitosNovos, Recuperadosnovos, emAcompanhamentoNovos, interior_metropolitana);
         }
+
+        void Allocate(ifstream &File){ // Método que lê todas as informações do .csv no programa
+            int cont=0;
+            do{
+                cont++;
+                if (!(cont%10000)){ // Atualiza a tela com uma porcentagem do carregamento
+                    system("CLS");
+                    cout << "Por favor, aguarde. Estamos atualizando nossos dados..." << endl;
+                    cout << "Carregamento: " << ( ((float) cont/960000)*100 ) << "%" << endl << endl;
+                }
+                string line;
+                getline (File,line);
+
+                string region_aux, state_aux, county_aux;
+                int coduf, codmun;
+
+                region_aux = textUntilDivision(line,1);
+                state_aux = textUntilDivision(line,1);
+                county_aux = textUntilDivision(line,1);
+                try{ coduf = stoi(textUntilDivision(line,1)); }catch(...){ coduf = 0; }
+                try{ codmun = stoi(textUntilDivision(line,1)); }catch(...){ codmun = 0; }
+
+                if (!File.eof()) { // Somente roda se ainda existir algo para ser lido no arquivo
+
+                    // Acha a região correspondente
+                    int it_region=0;
+                    for(it_region=0;it_region<region.size();it_region++)
+                        if(region[it_region].get_region_name() == region_aux)
+                            break;
+
+                    if(it_region == region.size()){
+                        region.push_back(Region(region_aux));
+                        it_region = region.size()-1;
+    //                    cout << "Create Region:" << region_aux << endl;
+                    }
+
+                    if (state_aux == "") // Adiciona região e sua Info no vector region
+                        (region[it_region].info).push_back(lineToInfo(line,0));
+                    else {
+                        // Acha o estado correspondente
+                        int it_state=0;
+                        for (it_state=0;it_state<(region[it_region].state).size();it_state++)
+                            if ((region[it_region].state)[it_state].get_state_name() == state_aux)
+                                break;
+
+                        if (it_state == (region[it_region].state).size()){
+                            (region[it_region].state).push_back(State(coduf, state_aux));
+                            it_state = (region[it_region].state).size()-1;
+    //                        cout << "Create State:" << state_aux << endl;
+                        }
+
+                        if (county_aux == "")
+                            ((region[it_region].state[it_state]).info).push_back(lineToInfo(line,1));
+                        else {
+                            // Acha o município correspondente
+                            int it_county=0;
+                            for (it_county=0;it_county<((region[it_region].state[it_state]).county).size();it_county++)
+                                if (((region[it_region].state[it_state]).county[it_county]).get_county_name() == county_aux)
+                                    break;
+
+                        //    cout << "Is County:" << county_aux << endl;
+                            if (it_county == ((region[it_region].state[it_state]).county).size()){
+    //                            cout << "Create County:" << county_aux << endl;
+                                ((region[it_region].state[it_state]).county).push_back(County(county_aux, codmun));
+                                it_county = ((region[it_region].state[it_state]).county).size()-1;
+                            }
+
+                            (((region[it_region].state[it_state]).county[it_county]).info).push_back(lineToInfo(line,2));
+                        }
+                    }
+                }
+            } while (!File.eof());
+            system("CLS");
+            cout << "Dados carregados com sucesso!" << endl << endl;
+        }
+
+        void escRegion(){ // Escolhe as regiões a partir da entrada do usuário
+            string esc_aux;
+            bool repeat=false;
+            do {
+                int esc_region;
+                if (repeat)
+                    cout << "Escolha uma opcao valida!" << endl;
+                cout << "Qual regiao deseja analisar?" << endl;
+                    
+                for(int i=0;i<region.size();i++)
+                    cout << i << " - " << region[i].get_region_name() << endl;
+
+                cout << region.size() << " - Sair do programa" << endl;
+
+                cout << "Escolha: ";
+                cin >> esc_aux; // Escolha do usuário
+                try {
+                    esc_region = stoi(esc_aux);
+
+                    if(esc_region==region.size()){
+                        isEnd = true;
+                        break;
+                    } else 
+                        if (esc_region<0 || esc_region>region.size())
+                            repeat = true;
+                        else {
+                            escState(esc_region); // A depender da escolho do usuário, entra em um estado específico
+                            repeat = false;
+                        }
+                } catch(...) {
+                    repeat = true;
+                }
+            } while (!(isEnd));
+        }
+
+        void escState(int esc_region){ // Escolhe os estados a partir da entrada do usuário
+            int esc_state;
+            string esc_state_aux;
+            bool repeat=false;
+            do {
+                if (repeat)
+                    cout << "Escolha uma opcao valida!" << endl;
+                cout << "Qual estado deseja analisar?" << endl;
+                
+                for(int i=0;i<(region[esc_region].state).size();i++)
+                    cout << i << " - " << (region[esc_region].state[i]).get_state_name() << endl;
+                
+                cout << (region[esc_region].state).size() << " - Analisar a propria regiao " << region[esc_region].get_region_name() << endl;
+                cout << (region[esc_region].state).size()+1 << " - Voltar para o menu inicial" << endl;
+                cout << (region[esc_region].state).size()+2 << " - Sair do programa" << endl;
+
+                cout << "Escolha: ";
+                cin >> esc_state_aux; // Escolha do usuário
+                try {
+                    esc_state = stoi(esc_state_aux);
+                    
+                    if(esc_state==(region[esc_region].state).size()+1)
+                        break;
+                    if(esc_state==(region[esc_region].state).size()+2){
+                        isEnd = true;
+                        break;
+                    }
+                    else 
+                        if (esc_state<0 || esc_state>(region[esc_region].state).size()+2)
+                            repeat = true;
+                        else{
+                            if (esc_state==(region[esc_region].state).size())
+                                funcInfos(); // Analisa os dados da própria região [A SER IMPLEMENTADO]
+                            else {
+                                escCounty(esc_state, esc_region); // Analisa os municipios de um determinado estado 
+                                break;
+                            }
+                            repeat = false;
+                        }
+                } catch(...) {
+                    repeat = true;
+                }
+            } while (1);
+        }
+
+        void escCounty(int esc_state, int esc_region){ // Escolhe os municipios a partir da entrada do usuário
+            int esc_county;
+            string esc_county_aux;
+            bool repeat=false;
+            do {
+                if (repeat)
+                    cout << endl << "Escolha uma opcao valida!" << endl;
+                cout << "Qual municipio deseja analisar?" << endl;
+                
+                for(int i=0;i<((region[esc_region].state[esc_state]).county).size();i++)
+                    cout << i << " - " << ((region[esc_region].state[esc_state]).county[i]).get_county_name() << endl;
+                
+                cout << ((region[esc_region].state[esc_state]).county).size() << " - Analisar o proprio estado " << (region[esc_region].state[esc_state]).get_state_name() << endl;
+                cout << ((region[esc_region].state[esc_state]).county).size()+1 << " - Voltar para o menu inicial" << endl;
+                cout << ((region[esc_region].state[esc_state]).county).size()+2 << " - Sair do programa" << endl;
+                
+                cout << "Escolha: ";
+                cin >> esc_county_aux; // Escolha do usuario
+                try {
+                    esc_county = stoi(esc_county_aux);
+
+                    if(esc_county==((region[esc_region].state[esc_state]).county).size()+1)
+                        break;
+                    if(esc_county==((region[esc_region].state[esc_state]).county).size()+2){
+                        isEnd = true;
+                        break;
+                    }
+                    else{
+                        if (esc_county<0 || esc_county>((region[esc_region].state[esc_state]).county).size()+2)
+                            repeat = true;
+                        else{
+                            if(esc_county==((region[esc_region].state[esc_state]).county).size()) // funcInfos() para o State
+                                funcInfos(); // Analisa os dados do próprio estado [A SER IMPLEMENTADO]
+                            else { // funcInfos() para os County
+                                funcInfos(); // Analisa os dados de um dado municipio [A SER IMPLEMENTADO]
+                            }
+                            repeat = false;
+                        }
+                    }
+                } catch(...) {
+                    repeat = true;
+                }
+            } while (1);
+        }
+
+        void funcInfos(){ // Realiza todas as manipulações com os dados que o usuário quiser
+            cout << "I'm in funcInfos!" << endl;
+        }
+
+        System (ifstream &File){
+            Allocate(File);
+            escRegion();
+        }
 };
 
 int main() {
-
     string text;
 
     ifstream File("HIST_PAINEL_COVIDBR_Parte3_20jun2021.csv");
 
     getline (File, text);
-    cout << text <<endl;
 
-    getline (File, text);
-    cout << text <<endl;
+    System t = System(File);
 
-    System t = text;
-    t.textUntilDivision(text,1);
-    cout << text << endl;
-
-    getline (File, text);
-    cout << text <<endl;
+    cout << "Region name:" << (t.region[0]).get_region_name() << endl;
+    cout << "Info:" << ((t.region[0]).info[0]).data << endl;
 
     File.close();
 }
