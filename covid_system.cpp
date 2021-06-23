@@ -2,7 +2,7 @@
 #include <string>   
 #include <fstream>
 #include <vector>
-#include <ctime>
+#include <locale.h>
 
 using namespace std;
 
@@ -94,6 +94,7 @@ class County { // Classe dos Municípios
 class System {
     protected:
         bool isEnd = false;
+        int esc_region, esc_state, esc_county;
     public:
         vector <Region> region;
         // Método que retorna a string antes do ';' ou do '\n'
@@ -232,7 +233,9 @@ class System {
             string esc_aux;
             bool repeat=false;
             do {
-                int esc_region;
+                esc_region=-1;
+                system("CLS");
+                cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 if (repeat)
                     cout << "Escolha uma opcao valida!" << endl;
                 cout << "Qual regiao deseja analisar?" << endl;
@@ -264,10 +267,13 @@ class System {
         }
 
         void escState(int esc_region){ // Escolhe os estados a partir da entrada do usuário
-            int esc_state;
+            esc_state = -1;
             string esc_state_aux;
             bool repeat=false;
             do {
+                system("CLS");
+                cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
+                cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
                 if (repeat)
                     cout << "Escolha uma opcao valida!" << endl;
                 cout << "Qual estado deseja analisar?" << endl;
@@ -295,11 +301,10 @@ class System {
                             repeat = true;
                         else{
                             if (esc_state==(region[esc_region].state).size())
-                                funcInfos(); // Analisa os dados da própria região [A SER IMPLEMENTADO]
-                            else {
-                                escCounty(esc_state, esc_region); // Analisa os municipios de um determinado estado 
-                                break;
-                            }
+                                funcInfos(0); // Analisa os dados da própria região [A SER IMPLEMENTADO]
+                            else 
+                                escCounty(); // Analisa os municipios de um determinado estado 
+                            break;
                             repeat = false;
                         }
                 } catch(...) {
@@ -308,11 +313,16 @@ class System {
             } while (1);
         }
 
-        void escCounty(int esc_state, int esc_region){ // Escolhe os municipios a partir da entrada do usuário
-            int esc_county;
+        void escCounty(){ // Escolhe os municipios a partir da entrada do usuário
+            esc_county = -1;
             string esc_county_aux;
             bool repeat=false;
             do {
+                system("CLS");
+                cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
+                cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
+                cout << "[ ESTADO " << (region[esc_region].state[esc_state]).get_state_name() << " ]" << endl;
+
                 if (repeat)
                     cout << endl << "Escolha uma opcao valida!" << endl;
                 cout << "Qual municipio deseja analisar?" << endl;
@@ -340,10 +350,11 @@ class System {
                             repeat = true;
                         else{
                             if(esc_county==((region[esc_region].state[esc_state]).county).size()) // funcInfos() para o State
-                                funcInfos(); // Analisa os dados do próprio estado [A SER IMPLEMENTADO]
+                                funcInfos(1); // Analisa os dados do próprio estado [A SER IMPLEMENTADO]
                             else { // funcInfos() para os County
-                                funcInfos(); // Analisa os dados de um dado municipio [A SER IMPLEMENTADO]
+                                funcInfos(2); // Analisa os dados de um dado municipio [A SER IMPLEMENTADO]
                             }
+                            break;
                             repeat = false;
                         }
                     }
@@ -352,9 +363,93 @@ class System {
                 }
             } while (1);
         }
+        // Realiza todas as manipulações com os dados que o usuário quiser
+        void funcInfos(int tipo){
+            cout << "I'm in funcInfos " << tipo << " !" << endl;
+            
+            system("CLS");
+            cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
+            cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
+            
+            vector <Info> *ptr;
+            // Passa para o ponteiro o vector <Info> em cada caso
+            if (tipo==0)
+                ptr = &(region[esc_region].info);
+            else {
+                cout << "[ ESTADO " << (region[esc_region].state[esc_state]).get_state_name() << " ]" << endl;
+                if (tipo==1)
+                    ptr = &((region[esc_region].state[esc_state]).info);
+                else {
+                    ptr = &(((region[esc_region].state[esc_state]).county[esc_county]).info);
+                    cout << "[ MUNICIPIO " << ((region[esc_region].state[esc_state]).county[esc_county]).get_county_name() << " ]" << endl;
+                }
+            }
 
-        void funcInfos(){ // Realiza todas as manipulações com os dados que o usuário quiser
-            cout << "I'm in funcInfos!" << endl;
+            bool repeat = false;
+            bool endDo = false;
+            string esc_aux;
+            int esc;
+            do { // Menu que recebe as escolhas para dado local
+                system("CLS");
+                cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
+                cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
+                if (tipo>0) {
+                    cout << "[ ESTADO " << (region[esc_region].state[esc_state]).get_state_name() << " ]" << endl;
+                    if (tipo==1)
+                        ptr = &((region[esc_region].state[esc_state]).info);
+                    else 
+                        cout << "[ MUNICIPIO " << ((region[esc_region].state[esc_state]).county[esc_county]).get_county_name() << " ]" << endl;
+                }
+
+                if (repeat)
+                    cout << endl << "Escolha uma opcao valida!" << endl;
+                cout << "0 - Total de casos em determinada data" << endl;
+                cout << "1 - Total de obitos em determinada data" << endl;
+                cout << "2 - Cálculo da média móvel determinada data" << endl;
+                cout << "3 - Cálculo da tendência de crescimento entre duas médias móveis" << endl;
+                cout << "4 - [A ESCOLHER UMA PERGUNTA UNICA]" << endl;
+                cout << "5 - Voltar para o menu inicial" << endl;
+                cout << "6 - Sair do programa" << endl;
+
+                cout << "Escolha: ";
+                cin >> esc_aux; // Escolha do usuario
+                try {
+                    esc = stoi(esc_aux);
+                    switch (esc){
+                        case 0: // Total de casos em determinada data
+                    //       cout << "esc: " << esc << endl;
+                            break;
+                        case 1: // Total de obitos em determinada data
+                    //       cout << "esc: " << esc << endl;
+                            break;
+                        case 2: // Cálculo da média móvel determinada data
+                    //        cout << "esc: " << esc << endl;
+                            break;
+                        case 3: // Cálculo da tendência de crescimento entre duas médias móveis
+                    //        cout << "esc: " << esc << endl;
+                            break;
+                        case 4: // [A ESCOLHER UMA PERGUNTA ÚNICA]
+                    //        cout << "esc: " << esc << endl;
+                            break;
+                        case 5: // Voltar para o menu inicial
+                    //        cout << "esc: " << esc << endl;
+                            endDo = true;
+                            break;
+                        case 6: // Sair do programa
+                    //       cout << "esc: " << esc << endl;
+                            isEnd = true;
+                            endDo = true;
+                            break;
+                        default:
+                    //        cout << "esc: " << esc << endl;
+                            repeat = true;
+                    }
+                    if (esc>=0 && esc<=6)
+                        repeat = false;
+                } catch(...) {
+                    repeat = true;
+                }
+            } while (!(endDo));
         }
 
         System (ifstream &File){
@@ -366,14 +461,15 @@ class System {
 int main() {
     string text;
 
+    //setlocale(LC_ALL, "Portuguese");
+
     ifstream File("HIST_PAINEL_COVIDBR_Parte3_20jun2021.csv");
 
     getline (File, text);
 
     System t = System(File);
 
-    cout << "Region name:" << (t.region[0]).get_region_name() << endl;
-    cout << "Info:" << ((t.region[0]).info[0]).data << endl;
+    cout << "Programa finalizado com sucesso!" << endl;
 
     File.close();
 }
