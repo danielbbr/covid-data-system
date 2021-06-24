@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <locale.h>
+#include <iomanip>
 
 using namespace std;
 
@@ -90,8 +91,8 @@ class County { // Classe dos Municípios
         : name(name), codmun(codmun) {}
 };
 
-// Classe que vai gerir todo o sistema
-class System {
+
+class System { // Classe que vai gerir todo o sistema
     protected:
         bool isEnd = false;
         int esc_region, esc_state, esc_county;
@@ -160,9 +161,9 @@ class System {
             do{
                 cont++;
                 if (!(cont%10000)){ // Atualiza a tela com uma porcentagem do carregamento
-                    system("CLS");
+                    //system("CLS");
                     cout << "Por favor, aguarde. Estamos atualizando nossos dados..." << endl;
-                    cout << "Carregamento: " << ( ((float) cont/960000)*100 ) << "%" << endl << endl;
+                    cout << "Carregamento: " << fixed << setprecision(2) << ( ((float) cont/960000)*100 ) << "%" << endl << endl;
                 }
                 string line;
                 getline (File,line);
@@ -226,7 +227,7 @@ class System {
                     }
                 }
             } while (!File.eof());
-            system("CLS");
+            //system("CLS");
             cout << "Dados carregados com sucesso!" << endl << endl;
         }
 
@@ -235,7 +236,7 @@ class System {
             bool repeat=false;
             do {
                 esc_region=-1;
-                system("CLS");
+                //system("CLS");
                 cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 if (repeat)
                     cout << "Escolha uma opcao valida!" << endl;
@@ -272,7 +273,7 @@ class System {
             string esc_state_aux;
             bool repeat=false;
             do {
-                system("CLS");
+                //system("CLS");
                 cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
                 if (repeat)
@@ -319,7 +320,7 @@ class System {
             string esc_county_aux;
             bool repeat=false;
             do {
-                system("CLS");
+                //system("CLS");
                 cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
                 cout << "[ ESTADO " << (region[esc_region].state[esc_state]).get_state_name() << " ]" << endl;
@@ -368,7 +369,7 @@ class System {
         void funcInfos(int tipo){
             cout << "I'm in funcInfos " << tipo << " !" << endl;
             
-            system("CLS");
+            //system("CLS");
             cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
             cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
             
@@ -390,7 +391,7 @@ class System {
             string esc_aux;
             int esc;
             do { // Menu que recebe as escolhas para dado local
-                system("CLS");
+                //system("CLS");
                 cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
                 if (tipo>0) {
@@ -469,7 +470,7 @@ class System {
                         default:
                             repeat = true;
                     }
-                    system("PAUSE");
+                    programPause();
                     if (esc>=0 && esc<=8)
                         repeat = false;
                 } catch(...) {
@@ -535,7 +536,7 @@ class System {
                     repeat = true;
                 }
             } while (!(isDataOk));
-//            system("PAUSE");
+//            programPause();
             return data;
         }
 
@@ -699,7 +700,12 @@ class System {
                 else
                     return 0;
         }
-
+        void programPause(){
+	        cout << "Pressione enter para continuar...";
+	        getchar();
+	        getchar();
+	        cout << endl;
+}
         System (ifstream &File){
             Allocate(File);
             escRegion();
