@@ -95,6 +95,7 @@ class System {
     protected:
         bool isEnd = false;
         int esc_region, esc_state, esc_county;
+        vector <Info> *ptr;
     public:
         vector <Region> region;
         // Método que retorna a string antes do ';' ou do '\n'
@@ -103,7 +104,7 @@ class System {
             int i=0;
             
             // Passa os valores até antes da divisão
-            while (line[i]!=';' && line[i]!='\n' && line[i]!='\0'){
+            while (line[i]!=';' && line[i]!='\n' && line[i]!='\0' && line[i]!='/'){
                 text+=line[i];
                 i++;
             }
@@ -371,7 +372,6 @@ class System {
             cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
             cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
             
-            vector <Info> *ptr;
             // Passa para o ponteiro o vector <Info> em cada caso
             if (tipo==0)
                 ptr = &(region[esc_region].info);
@@ -405,51 +405,299 @@ class System {
                     cout << endl << "Escolha uma opcao valida!" << endl;
                 cout << "0 - Total de casos em determinada data" << endl;
                 cout << "1 - Total de obitos em determinada data" << endl;
-                cout << "2 - Cálculo da média móvel determinada data" << endl;
-                cout << "3 - Cálculo da tendência de crescimento entre duas médias móveis" << endl;
-                cout << "4 - [A ESCOLHER UMA PERGUNTA UNICA]" << endl;
-                cout << "5 - Voltar para o menu inicial" << endl;
-                cout << "6 - Sair do programa" << endl;
+                cout << "2 - Calculo da media movel de casos em determinada data" << endl;
+                cout << "3 - Calculo da media movel de obitos em determinada data" << endl;
+                cout << "4 - Calculo da tendencia de crescimento de casos entre duas medias moveis" << endl;
+                cout << "5 - Calculo da tendencia de crescimento de obitos entre duas medias moveis" << endl;
+                cout << "6 - [A ESCOLHER UMA PERGUNTA UNICA (talvez taxa de mortalidade?)]" << endl;
+                cout << "7 - Voltar para o menu inicial" << endl;
+                cout << "8 - Sair do programa" << endl;
 
                 cout << "Escolha: ";
                 cin >> esc_aux; // Escolha do usuario
                 try {
                     esc = stoi(esc_aux);
+                    string data1="", data2="";
+                    int aux=0;
+                    float auxf=0.0;
                     switch (esc){
                         case 0: // Total de casos em determinada data
-                    //       cout << "esc: " << esc << endl;
+                            aux = totalDeCasosObitos(esc);
+                            cout << "Total de novos casos: " << aux << endl;
                             break;
                         case 1: // Total de obitos em determinada data
-                    //       cout << "esc: " << esc << endl;
+                            aux = totalDeCasosObitos(esc);
+                            cout << "Total de novos obitos: " << aux << endl;
                             break;
-                        case 2: // Cálculo da média móvel determinada data
-                    //        cout << "esc: " << esc << endl;
+                        case 2: // Cálculo da média móvel de casos em determinada data
+                            auxf = mediaMovel(false,0,"");
+                            cout << "Media movel de casos: " << auxf << endl;
                             break;
-                        case 3: // Cálculo da tendência de crescimento entre duas médias móveis
-                    //        cout << "esc: " << esc << endl;
+                        case 3: // Cálculo da média móvel de obitos em determinada data
+                            auxf = mediaMovel(true,0,"");
+                            cout << "Media movel de obitos: " << auxf << endl;
                             break;
-                        case 4: // [A ESCOLHER UMA PERGUNTA ÚNICA]
-                    //        cout << "esc: " << esc << endl;
+                        case 4: // Cálculo da tendência de crescimento de casos entre duas médias móveis
+                            aux = tendenciaCresc(false);
+                            if (aux==1)
+                                cout << "Situacao em crescimento" << endl;
+                            else
+                                if (aux==-1)
+                                    cout << "Situacao em queda" << endl;
+                                else
+                                    cout << "Situacao estavel" << endl;
                             break;
-                        case 5: // Voltar para o menu inicial
-                    //        cout << "esc: " << esc << endl;
+                        case 5: // Cálculo da tendência de crescimento de obitos entre duas médias móveis
+                            aux = tendenciaCresc(true);
+                            if (aux==1)
+                                cout << "Situacao em crescimento" << endl;
+                            else
+                                if (aux==-1)
+                                    cout << "Situacao em queda" << endl;
+                                else
+                                    cout << "Situacao estavel" << endl;
+                            break;
+                        case 6: // [A ESCOLHER UMA PERGUNTA ÚNICA]
+                            break;
+                        case 7: // Voltar para o menu inicial
                             endDo = true;
                             break;
-                        case 6: // Sair do programa
-                    //       cout << "esc: " << esc << endl;
+                        case 8: // Sair do programa
                             isEnd = true;
                             endDo = true;
                             break;
                         default:
-                    //        cout << "esc: " << esc << endl;
                             repeat = true;
                     }
-                    if (esc>=0 && esc<=6)
+                    system("PAUSE");
+                    if (esc>=0 && esc<=8)
                         repeat = false;
                 } catch(...) {
                     repeat = true;
                 }
             } while (!(endDo));
+        }
+
+        string lerData (){
+            string data, aux="";
+            bool repeat = false;
+            int dia, mes, ano;
+            bool isDataOk = false;
+
+            do {
+                if (repeat)
+                    cout << "\nInsira uma data valida!" << endl;
+                cout << "Entre com a data desejada no formato (DD/MM/AAAA): ";
+                cin >> data;
+                aux = textUntilDivision(data,1);
+//                cout << "dia lido:" << aux << endl;
+                try {
+                    dia = stoi(aux);
+                    aux = textUntilDivision(data,1);
+//                    cout << "mes lido:" << aux << endl;
+                    try {
+                        mes = stoi(aux);
+                        aux = textUntilDivision(data,1);
+//                        cout << "ano lido:" << aux << endl;
+                        try {
+                            ano = stoi(aux);
+                            if(dia<1 || dia>31 || mes<1 || mes>12 || ano<2000 || ano>2021) 
+                                repeat = true;
+                            else {
+                                data="";
+                                data += to_string(ano)+"-";
+                                if (mes<10)
+                                    data += "0";
+                                data += to_string(mes)+"-";
+                                if (dia<10)
+                                    data += "0";
+                                data += to_string(dia);
+
+                            /*    cout << "Data final:" << data << endl;
+
+                                cout << "Data begin:" << (ptr->begin())->data << endl;
+                                cout << "Data end:" << (--(ptr->end()))->data << endl;*/
+
+                                if ((ptr->begin())->data<=data && (--(ptr->end()))->data>=data){
+                                    repeat = false;
+                                    isDataOk = true;
+                                }
+                                else
+                                    repeat = true;
+                            }
+                        } catch (...) {
+                            repeat = true;
+                        }
+                    } catch (...) {
+                        repeat = true;
+                    }
+                } catch (...) {
+                    repeat = true;
+                }
+            } while (!(isDataOk));
+//            system("PAUSE");
+            return data;
+        }
+
+        int totalDeCasosObitos (int esc) {
+            string data1, data2;
+            int cont=0;
+            do {
+                if (cont)
+                    cout << "A data inicial nao pode ser maior que a data final!" << endl;
+                cout << "Insira as datas inicial e final, respectivamente, para a analise." << endl;
+                data1=""; data2="";
+                data1 = lerData();
+//                cout << "1a Data lida: " << data1 << endl;
+                data2 = lerData();
+//                cout << "2a Data lida: " << data2 << endl;
+                cont++;
+            } while (data1 > data2);
+
+            auto it = ptr->begin();
+
+            while (it->data!=data1) {
+                it++;
+            };
+
+            int total=0;
+            if (esc==0)
+                total = it->casosNovos;
+            else
+                total = it->obitosNovos;
+
+            while (it->data!=data2) {
+                it++;
+                if (esc==0)
+                total += it->casosNovos;
+            else
+                total += it->obitosNovos;
+            };
+
+            return total;
+        }
+
+        float mediaMovel (bool casosObitos, int janela, string data) {
+            float media=0;
+            string sjanela;
+            bool repeat;
+            if (data=="")
+                data = lerData();
+            repeat = false;
+            auto it = ptr->begin();
+            do {
+                if (janela==0) {
+                    if (repeat)
+                        cout << "Janela para media movel invalida!" << endl;
+                    cout << "Insira a janela para o calculo da media movel: ";
+                    cin >> sjanela;
+                }
+                try {
+                    if (janela==0) 
+                        janela = stoi (sjanela);
+                    if (janela>0){
+                        it = ptr->begin();
+                        while (it->data!=data) {
+                            it++;
+                        };
+
+                        if (distance(ptr->begin(), it)>=janela-1)
+                            break;
+                        else
+                            repeat = true;
+                    } else
+                        repeat = true;
+                } catch (...) {
+                    repeat = true;
+                }
+            } while (1);
+
+            int i=janela-1;
+            do {
+                if (casosObitos)
+                    media += it->obitosNovos;
+                else
+                    media += it->casosNovos;
+                it--;
+                i--;
+            } while (i>=0);
+
+            media = media / (janela);
+
+            return media;
+        }
+
+        int tendenciaCresc (bool casosObitos) {
+            float media, media_ant;
+            bool repeat = false;
+            string sjanela, sintervalo;
+            int janela, intervalo;
+            auto it = ptr->begin();
+            auto it_ant = ptr->begin();
+            string data, data_ant;
+            do {
+                data = lerData();
+                do {
+                    if (repeat)
+                        cout << "Janela para media movel invalida!" << endl;
+                    cout << "Insira a janela para o calculo da media movel: ";
+                    cin >> sjanela;
+                    try {
+                        janela = stoi (sjanela);
+                        if (janela>0){
+                            it = ptr->begin();
+                            while (it->data!=data) {
+                                it++;
+                            };
+
+                            if (distance(ptr->begin(), it)>=janela-1) {
+                                repeat = false;
+                                break;
+                            } else
+                                repeat = true;
+                        } else
+                            repeat = true;
+                    } catch (...) {
+                        repeat = true;
+                    }
+                } while (repeat);
+
+                repeat = false;
+                do {
+                    if (repeat)
+                        cout << "Intervalo invalido!" << endl;
+                    cout << "Insira o intervalo para o calculo da tendencia de crescimento: ";
+                    cin >> sintervalo;
+                    try {
+                        intervalo = stoi (sintervalo);
+                        if (intervalo>0 && distance(ptr->begin(), it)>=janela+intervalo-1){
+                            it_ant = it;
+                            int cont = 0;
+                            while (cont<intervalo) {
+                                it_ant--;
+                                cont++;
+                            };
+                            data_ant = it_ant->data;
+                            repeat = false;
+                            break;
+                        } else
+                            repeat = true;
+                    } catch (...) {
+                        repeat = true;
+                    }
+                } while (repeat);
+            } while (repeat);
+
+            media = mediaMovel(casosObitos,janela,data);
+            media_ant = mediaMovel(casosObitos,janela,data_ant);
+
+            if (media/media_ant >= 1.15)
+                return 1;
+            else
+                if (media/media_ant <= 0.85)
+                    return -1;
+                else
+                    return 0;
         }
 
         System (ifstream &File){
