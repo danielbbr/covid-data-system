@@ -803,7 +803,7 @@ int main() {
 
    // ifstream File("HIST_PAINEL_COVIDBR_Parte3_20jun2021.csv");
 
-    ifstream File("teste.csv");
+    ifstream File("File_without_counties.csv");
 
     getline (File, text);
 
