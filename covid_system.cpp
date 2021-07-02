@@ -1,3 +1,11 @@
+#ifdef _WIN32 
+	#include "clear_windows.h"
+
+#elif __unix__
+	#include "clear_unix.h"
+
+#endif
+
 #include "class.h"
 
 class System { // Classe que vai gerir todo o sistema
@@ -69,7 +77,7 @@ class System { // Classe que vai gerir todo o sistema
             do{
                 cont++;
                 if (!(cont%10000)){ // Atualiza a tela com uma porcentagem do carregamento
-                    //system("CLS");
+                    ClearScreen();
                     cout << "Por favor, aguarde. Estamos atualizando nossos dados..." << endl;
                     cout << "Carregamento: " << fixed << setprecision(2) << ( ((float) cont/960000)*100 ) << "%" << endl << endl;
                 }
@@ -134,7 +142,7 @@ class System { // Classe que vai gerir todo o sistema
                     }
                 }
             } while (!File.eof());
-            //system("CLS");
+            ClearScreen();
             cout << "Dados carregados com sucesso!" << endl << endl;
         }
 
@@ -143,7 +151,7 @@ class System { // Classe que vai gerir todo o sistema
             bool repeat=false;
             do {
                 esc_region=-1;
-                //system("CLS");
+                ClearScreen();
                 cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 if (repeat)
                     cout << "Escolha uma opcao valida!" << endl;
@@ -180,7 +188,7 @@ class System { // Classe que vai gerir todo o sistema
             string esc_state_aux;
             bool repeat=false;
             do {
-                //system("CLS");
+                ClearScreen();
                 cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
                 if (repeat)
@@ -227,7 +235,7 @@ class System { // Classe que vai gerir todo o sistema
             string esc_county_aux;
             bool repeat=false;
             do {
-                //system("CLS");
+                ClearScreen();
                 cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
                 cout << "[ ESTADO " << (region[esc_region].state[esc_state]).get_state_name() << " ]" << endl;
@@ -363,7 +371,7 @@ class System { // Classe que vai gerir todo o sistema
             int esc;
 
             do { // Menu que recebe as escolhas para dado local
-                //system("CLS");
+                ClearScreen();
                 cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
                 if (tipo>0) {
@@ -455,7 +463,7 @@ class System { // Classe que vai gerir todo o sistema
         // Realiza todas as manipulações com os dados que o usuário quiser
         void funcInfos(int tipo){
         //    cout << "I'm in funcInfos " << tipo << " !" << endl; 
-            //system("CLS");
+            ClearScreen();
             
             // Passa para o ponteiro o vector <Info> em cada caso
             if (tipo==0)
@@ -473,7 +481,7 @@ class System { // Classe que vai gerir todo o sistema
             string esc_aux;
             int esc;
             do { // Menu que recebe as escolhas para dado local
-                //system("CLS");
+                ClearScreen();
                 cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
                 if (tipo>0) {
