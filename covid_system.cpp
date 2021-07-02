@@ -782,9 +782,10 @@ class System { // Classe que vai gerir todo o sistema
 
             media = mediaMovel(casosObitos,janela,data);
             media_ant = mediaMovel(casosObitos,janela,data_ant);
-
+            
             if (media/media_ant >= 1.15)
                 return 1;
+                
             else
                 if (media/media_ant <= 0.85)
                     return -1;
@@ -811,8 +812,11 @@ int main() {
 
    // ifstream File("HIST_PAINEL_COVIDBR_Parte3_20jun2021.csv");
 
-    ifstream File("File_without_counties.csv");
-
+    ifstream File("HIST_PAINEL_COVIDBR_Parte3_20jun2021.csv");
+    if (!File.is_open()) {
+        cout << "Erro na leitura do arquivo" << endl;
+        return -1;
+    }
     getline (File, text);
 
     System t = System(File);
