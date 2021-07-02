@@ -1,7 +1,5 @@
 #include "class.h"
 
-using namespace std;
-
 class System { // Classe que vai gerir todo o sistema
     protected:
         bool isEnd = false;
@@ -261,9 +259,9 @@ class System { // Classe que vai gerir todo o sistema
                             repeat = true;
                         else{
                             if(esc_county==((region[esc_region].state[esc_state]).county).size()) // funcInfos() para o State
-                                funcInfos(1); // Analisa os dados do próprio estado [A SER IMPLEMENTADO]
+                                funcInfos(1); // Analisa os dados do próprio estado
                             else { // funcInfos() para os County
-                                funcInfos(2); // Analisa os dados de um dado municipio [A SER IMPLEMENTADO]
+                                funcInfos(2); // Analisa os dados de um dado municipio
                             }
                             break;
                             repeat = false;
@@ -275,45 +273,198 @@ class System { // Classe que vai gerir todo o sistema
             } while (1);
         }
         
-        void histogram() {  //cidade/regiao, uma data inicial e uma data final
+        void plot_histogram (vector <Info>& info, int inicio, int final, int esc) {  //cidade/regiao, uma data inicial e uma data final
+            float altura_plot = 20;
+
+            vector <float> dados;
+
+            vector <Info> info_local;
+
+            for (int i=0;i<final-inicio+1;i++)
+                info_local.push_back(info[inicio+i]);
+
+            for (int i=0;i<final-inicio+1;i++) {
+                
+                switch (esc) {
+                    case 0:
+                        dados.push_back(info_local[i].casosAcumulado);
+                        break;
+                    case 1:
+                        dados.push_back(info_local[i].casosNovos);
+                        break;
+                    case 2:
+                        dados.push_back(info_local[i].obitosAcumulado);
+                        break;
+                    case 3:
+                        dados.push_back(info_local[i].obitosNovos);
+                        break;
+                    default:
+                        break;
+                }
+                cout << dados.back() << " ";
+            }
+
+            float max = *max_element(dados.begin(), dados.end());
+
+            for (int i=0;i<dados.size();i++) 
+                dados[i] = altura_plot * dados[i] / (float)(max);
+
+            float delta = 0.5;
+
+            cout << endl;
+            cout << endl;
+
+            for (int i=0;i<altura_plot;i++) {
+
+                
+                cout << setw(9) << setfill(' ') << right 
+                << ((int)(max*((altura_plot-i)/altura_plot)))
+                << " " << (char) 179;
+
+                float degrau_piso = altura_plot-i-delta;
+            //    cout << "degrau_piso: " << degrau_piso << endl;
+                float degrau_teto = altura_plot-i+delta;
+
+                for (int j=0;j<final-inicio+1;j++) {
+                    if (dados[j]>=degrau_piso)
+                        cout << "   " << BLUE << (char) 219 << RESET << "   ";
+                    else
+                        cout << "       ";
+                }
+
+                cout << endl;
+            }
+
+            cout << "          " << (char) 192;
+            for (int i=0;i<final-inicio+1;i++) 
+                for (int j=0;j<7;j++)
+                    cout << (char) 196;
+
+            cout << endl;
+
+            cout << "           ";
+            for (int i=0;i<final-inicio+1;i++) {
+                string str = info_local[i].data;
+                for (int j=0;j<5;j++)
+                    str.erase(str.begin());
+                cout << " " << str << " ";
+            }
+
+            cout << endl;
+            cout << endl;
+
+        }
     
-    /*
-    for(int i = largest; i >= 1; i--)
+        void histogram (int tipo) {
 
-    Inside the body of the loop, do steps 3 to 5 inclusive
+            bool repeat = false;
+            bool endDo = false;
+            string esc_aux;
+            int esc;
 
-    If i <= value_of_column_a then print a *, otherwise print a space
+            do { // Menu que recebe as escolhas para dado local
+                //system("CLS");
+                cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
+                cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
+                if (tipo>0) {
+                    cout << "[ ESTADO " << (region[esc_region].state[esc_state]).get_state_name() << " ]" << endl;
+                    if (tipo==1)
+                        ptr = &((region[esc_region].state[esc_state]).info);
+                    else 
+                        cout << "[ MUNICIPIO " << ((region[esc_region].state[esc_state]).county[esc_county]).get_county_name() << " ]" << endl;
+                }
 
-    Repeat step 3 for each column (or write a loop...)
+                if (repeat)
+                    cout << endl << "Escolha uma opcao valida!" << endl;
+                cout << "0 - Plotar histograma de casos em determinada data" << endl;
+                cout << "1 - Plotar histograma de obitos em determinada data" << endl;
+                cout << "2 - Calculo da media movel de casos em determinada data" << endl;
+                cout << "3 - Calculo da media movel de obitos em determinada data" << endl;
+                cout << "4 - Calculo da tendencia de crescimento de casos entre duas medias moveis" << endl;
+                cout << "5 - Calculo da tendencia de crescimento de obitos entre duas medias moveis" << endl;
+                cout << "6 - Plotar histograma" << endl;
+                cout << "7 - Voltar para o menu inicial" << endl;
+                cout << "8 - Sair do programa" << endl;
 
-    Print a newline character
+                cout << "Escolha: ";
+                cin >> esc_aux; // Escolha do usuario
+                try {
+                    esc = stoi(esc_aux);
+                    string data1="", data2="";
+                    int aux=0;
+                    float auxf=0.0;
+                    switch (esc){
+                        case 0: // Total de casos em determinada data
+                        //    plot_histogram (*ptr, lerData(), lerData);
+                            break;
+                        case 1: // Total de obitos em determinada data
+                            aux = totalDeCasosObitos(esc);
+                            cout << "Total de novos obitos: " << aux << endl;
+                            break;
+                        case 2: // Cálculo da média móvel de casos em determinada data
+                            auxf = mediaMovel(false,0,"");
+                            cout << "Media movel de casos: " << auxf << endl;
+                            break;
+                        case 3: // Cálculo da média móvel de obitos em determinada data
+                            auxf = mediaMovel(true,0,"");
+                            cout << "Media movel de obitos: " << auxf << endl;
+                            break;
+                        case 4: // Cálculo da tendência de crescimento de casos entre duas médias móveis
+                            aux = tendenciaCresc(false);
+                            if (aux==1)
+                                cout << "Situacao em crescimento" << endl;
+                            else
+                                if (aux==-1)
+                                    cout << "Situacao em queda" << endl;
+                                else
+                                    cout << "Situacao estavel" << endl;
+                            break;
+                        case 5: // Cálculo da tendência de crescimento de obitos entre duas médias móveis
+                            aux = tendenciaCresc(true);
+                            if (aux==1)
+                                cout << "Situacao em crescimento" << endl;
+                            else
+                                if (aux==-1)
+                                    cout << "Situacao em queda" << endl;
+                                else
+                                    cout << "Situacao estavel" << endl;
+                            break;
+                        case 6: // [A ESCOLHER UMA PERGUNTA ÚNICA]
+                            
+                            break;
+                        case 7: // Voltar para o menu inicial
+                            endDo = true;
+                            break;
+                        case 8: // Sair do programa
+                            isEnd = true;
+                            endDo = true;
+                            break;
+                        default:
+                            repeat = true;
+                    }
+                    programPause();
+                    if (esc>=0 && esc<=8)
+                        repeat = false;
+                } catch(...) {
+                    repeat = true;
+                }
+            } while (!(endDo));
 
-    Print the horizontal line using -
+        }
 
-    Print the column labels
-    */
-    }
-    
-        
-        
         // Realiza todas as manipulações com os dados que o usuário quiser
         void funcInfos(int tipo){
-            cout << "I'm in funcInfos " << tipo << " !" << endl;
-            
+        //    cout << "I'm in funcInfos " << tipo << " !" << endl; 
             //system("CLS");
-            cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
-            cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
             
             // Passa para o ponteiro o vector <Info> em cada caso
             if (tipo==0)
                 ptr = &(region[esc_region].info);
             else {
-                cout << "[ ESTADO " << (region[esc_region].state[esc_state]).get_state_name() << " ]" << endl;
                 if (tipo==1)
                     ptr = &((region[esc_region].state[esc_state]).info);
                 else {
                     ptr = &(((region[esc_region].state[esc_state]).county[esc_county]).info);
-                    cout << "[ MUNICIPIO " << ((region[esc_region].state[esc_state]).county[esc_county]).get_county_name() << " ]" << endl;
                 }
             }
 
@@ -390,6 +541,7 @@ class System { // Classe que vai gerir todo o sistema
                                     cout << "Situacao estavel" << endl;
                             break;
                         case 6: // [A ESCOLHER UMA PERGUNTA ÚNICA]
+                            histogram (tipo);
                             break;
                         case 7: // Voltar para o menu inicial
                             endDo = true;
@@ -639,6 +791,7 @@ class System { // Classe que vai gerir todo o sistema
 }
         System (ifstream &File){
             Allocate(File);
+            plot_histogram(region[0].info, 0, 10, 1);
             escRegion();
         }
 };
@@ -648,7 +801,9 @@ int main() {
 
     //setlocale(LC_ALL, "Portuguese");
 
-    ifstream File("HIST_PAINEL_COVIDBR_Parte3_20jun2021.csv");
+   // ifstream File("HIST_PAINEL_COVIDBR_Parte3_20jun2021.csv");
+
+    ifstream File("teste.csv");
 
     getline (File, text);
 
