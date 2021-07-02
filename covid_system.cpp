@@ -402,8 +402,8 @@ class System { // Classe que vai gerir todo o sistema
                 cout << "[ PLOT DE HISTOGRAMA ]\n" << endl;
 
                 if (repeat)
-                    cout << "Escolha uma opcao valida!\n" << endl;
-                cout << "Deseja plotar o Histograma de:" << endl;
+                cout << "Escolha uma opcao valida!\n" << endl;
+                cout << "Deseja plotar o Histograma de 14 dias a frente:" << endl;
                 cout << "0 - Casos acumulados" << endl;
                 cout << "1 - Casos novos" << endl;
                 cout << "2 - Obitos acumulados" << endl;
