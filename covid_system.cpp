@@ -77,7 +77,6 @@ class System { // Classe que vai gerir todo o sistema
                 }
                 string line;
                 getline (File,line);
-
                 string region_aux, state_aux, county_aux;
                 int coduf, codmun;
 
@@ -224,7 +223,7 @@ class System { // Classe que vai gerir todo o sistema
                 }
             } while (1);
         }
-
+        
         void escCounty(){ // Escolhe os municipios a partir da entrada do usuário
             esc_county = -1;
             string esc_county_aux;
@@ -275,6 +274,28 @@ class System { // Classe que vai gerir todo o sistema
                 }
             } while (1);
         }
+        
+        void histogram() {  //cidade/regiao, uma data inicial e uma data final
+    
+    /*
+    for(int i = largest; i >= 1; i--)
+
+    Inside the body of the loop, do steps 3 to 5 inclusive
+
+    If i <= value_of_column_a then print a *, otherwise print a space
+
+    Repeat step 3 for each column (or write a loop...)
+
+    Print a newline character
+
+    Print the horizontal line using -
+
+    Print the column labels
+    */
+    }
+    
+        
+        
         // Realiza todas as manipulações com os dados que o usuário quiser
         void funcInfos(int tipo){
             cout << "I'm in funcInfos " << tipo << " !" << endl;
@@ -320,7 +341,7 @@ class System { // Classe que vai gerir todo o sistema
                 cout << "3 - Calculo da media movel de obitos em determinada data" << endl;
                 cout << "4 - Calculo da tendencia de crescimento de casos entre duas medias moveis" << endl;
                 cout << "5 - Calculo da tendencia de crescimento de obitos entre duas medias moveis" << endl;
-                cout << "6 - [A ESCOLHER UMA PERGUNTA UNICA (talvez taxa de mortalidade?)]" << endl;
+                cout << "6 - Plotar histograma" << endl;
                 cout << "7 - Voltar para o menu inicial" << endl;
                 cout << "8 - Sair do programa" << endl;
 
@@ -480,9 +501,9 @@ class System { // Classe que vai gerir todo o sistema
             while (it->data!=data2) {
                 it++;
                 if (esc==0)
-                total += it->casosNovos;
-            else
-                total += it->obitosNovos;
+                    total += it->casosNovos;
+                else
+                    total += it->obitosNovos;
             };
 
             return total;
