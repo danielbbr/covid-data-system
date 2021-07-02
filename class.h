@@ -5,7 +5,6 @@
 #include <string>   
 #include <fstream>
 #include <vector>
-#include <locale.h>
 #include <iomanip>
 #include <algorithm>
 #include <ios>
