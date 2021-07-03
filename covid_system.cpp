@@ -624,7 +624,9 @@ class System { // Classe que vai gerir todo o sistema
                     cout << "\nA data inicial nao pode ser maior que a data final!" << endl;
                 cout << "\nInsira as datas inicial e final, respectivamente, para a analise." << endl;
                 data1=""; data2="";
+                cout << "\nData inicial:" << endl;
                 data1 = lerData();
+                cout << "\nData final:" << endl;
                 data2 = lerData();
                 cont++;
             } while (data1 > data2);
