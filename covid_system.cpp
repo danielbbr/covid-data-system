@@ -69,7 +69,6 @@ class System { // Classe que vai gerir todo o sistema
             do{
                 cont++;
                 if (!(cont%10000)){ // Atualiza a tela com uma porcentagem do carregamento
-                    //ClearScreen();
                     cout << "Por favor, aguarde. Estamos atualizando nossos dados..." << endl;
                     cout << "Carregamento: " << fixed << setprecision(2) << ( ((float) cont/960000)*100 ) << "%" << endl << endl;
                 }
@@ -130,7 +129,6 @@ class System { // Classe que vai gerir todo o sistema
                     }
                 }
             } while (!File.eof());
-            //ClearScreen();
             cout << "Dados carregados com sucesso!\n" << endl;
         }
 
@@ -139,8 +137,7 @@ class System { // Classe que vai gerir todo o sistema
             bool repeat=false;
             do {
                 esc_region=-1;
-                //ClearScreen();
-                cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]\n" << endl;
+                cout << "\n[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]\n" << endl;
                 if (repeat)
                     cout << "Escolha uma opcao valida!\n" << endl;
                 cout << "Qual regiao deseja analisar?" << endl;
@@ -180,8 +177,7 @@ class System { // Classe que vai gerir todo o sistema
                 funcInfos(0);
             } else
                 do {
-                    //ClearScreen();
-                    cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
+                    cout << "\n[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                     cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]\n" << endl;
                     if (repeat)
                         cout << "Escolha uma opcao valida!\n" << endl;
@@ -223,8 +219,7 @@ class System { // Classe que vai gerir todo o sistema
             string esc_county_aux;
             bool repeat=false;
             do {
-                //ClearScreen();
-                cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
+                cout << "\n[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
                 cout << "[ ESTADO " << (region[esc_region].state[esc_state]).get_state_name() << " ]\n" << endl;
                 if (repeat)
@@ -291,16 +286,16 @@ class System { // Classe que vai gerir todo o sistema
             cout << endl;
             switch (esc) {
                     case 0:
-                        cout << "Casos acumulados por data:" << endl;
+                        cout << "Casos acumulados por data:\n" << endl;
                         break;
                     case 1:
-                        cout << "Casos novos por data:" << endl;
+                        cout << "Casos novos por data:\n" << endl;
                         break;
                     case 2:
-                        cout << "Obitos acumulados por data:" << endl;
+                        cout << "Obitos acumulados por data:\n" << endl;
                         break;
                     case 3:
-                        cout << "Obitos novos por data:" << endl;
+                        cout << "Obitos novos por data:\n" << endl;
                         break;
                     default:
                         break;
@@ -324,7 +319,7 @@ class System { // Classe que vai gerir todo o sistema
                         break;
                 }
                 string str = info[inicio+i].data;
-                cout << str << " - " << dados[i] << endl;
+                cout << str << " : " << (int) dados[i] << endl;
             }
 
             float max = *max_element(dados.begin(), dados.end());
@@ -380,8 +375,7 @@ class System { // Classe que vai gerir todo o sistema
             int esc;
 
             do { // Menu que recebe as escolhas para dado local
-                //ClearScreen();
-                cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
+                cout << "\n[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
                 if (tipo>0) {
                     cout << "[ ESTADO " << (region[esc_region].state[esc_state]).get_state_name() << " ]" << endl;
@@ -395,11 +389,12 @@ class System { // Classe que vai gerir todo o sistema
 
                 if (repeat)
                 cout << "Escolha uma opcao valida!\n" << endl;
-                cout << "Deseja plotar o Histograma de 14 dias a frente:" << endl;
+                cout << "Deseja plotar o Histograma de 14 dias a frente de:" << endl;
                 cout << "0 - Casos acumulados" << endl;
                 cout << "1 - Casos novos" << endl;
                 cout << "2 - Obitos acumulados" << endl;
                 cout << "3 - Obitos novos" << endl;
+                cout << "Ou" << endl;
                 cout << "4 - Voltar para o menu inicial" << endl;
                 cout << "5 - Sair do programa" << endl;
 
@@ -445,7 +440,6 @@ class System { // Classe que vai gerir todo o sistema
 
         // Realiza todas as manipulações com os dados que o usuário quiser
         void funcInfos(int tipo){
-            //ClearScreen();
             
             // Passa para o ponteiro o vector <Info> em cada caso
             if (tipo==0)
@@ -463,8 +457,7 @@ class System { // Classe que vai gerir todo o sistema
             string esc_aux;
             int esc;
             do { // Menu que recebe as escolhas para dado local
-                //ClearScreen();
-                cout << "[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
+                cout << "\n[ SISTEMA DE ACOMPANHAMENTO DO COVID NO BRASIL ]" << endl;
                 cout << "[ REGIAO " << region[esc_region].get_region_name() << " ]" << endl;
                 if (tipo>0) {
                     cout << "[ ESTADO " << (region[esc_region].state[esc_state]).get_state_name() << " ]" << endl;
@@ -477,10 +470,10 @@ class System { // Classe que vai gerir todo o sistema
 
                 if (repeat)
                     cout << "Escolha uma opcao valida!\n" << endl;
-                cout << "0 - Total de casos em determinada data" << endl;
-                cout << "1 - Total de obitos em determinada data" << endl;
-                cout << "2 - Calculo da media movel de casos em determinada data" << endl;
-                cout << "3 - Calculo da media movel de obitos em determinada data" << endl;
+                cout << "0 - Total de casos em determinado intervalo" << endl;
+                cout << "1 - Total de obitos em determinado intervalo" << endl;
+                cout << "2 - Calculo da media movel de casos em determinado intervalo" << endl;
+                cout << "3 - Calculo da media movel de obitos em determinado intervalo" << endl;
                 cout << "4 - Calculo da tendencia de crescimento de casos entre duas medias moveis" << endl;
                 cout << "5 - Calculo da tendencia de crescimento de obitos entre duas medias moveis" << endl;
                 cout << "6 - Plotar histograma" << endl;
@@ -495,19 +488,19 @@ class System { // Classe que vai gerir todo o sistema
                     int aux=0;
                     float auxf=0.0;
                     switch (esc){
-                        case 0: // Total de casos em determinada data
+                        case 0: // Total de casos em determinado intervalo
                             aux = totalDeCasosObitos(esc);
                             cout << "Total de novos casos: " << aux << endl;
                             break;
-                        case 1: // Total de obitos em determinada data
+                        case 1: // Total de obitos em determinado intervalo
                             aux = totalDeCasosObitos(esc);
                             cout << "Total de novos obitos: " << aux << endl;
                             break;
-                        case 2: // Cálculo da média móvel de casos em determinada data
+                        case 2: // Cálculo da média móvel de casos em determinado intervalo
                             auxf = mediaMovel(false,0,"");
                             cout << "Media movel de casos: " << auxf << endl;
                             break;
-                        case 3: // Cálculo da média móvel de obitos em determinada data
+                        case 3: // Cálculo da média móvel de obitos em determinado intervalo
                             auxf = mediaMovel(true,0,"");
                             cout << "Media movel de obitos: " << auxf << endl;
                             break;
@@ -560,10 +553,23 @@ class System { // Classe que vai gerir todo o sistema
             int dia, mes, ano;
             bool isDataOk = false;
 
+            string ultima_data_possivel;
+            if (isPlot) {
+                auto it = ptr->end();
+                for (int i=0;i<14;i++) {
+                    it--;
+                }
+                ultima_data_possivel = it->data;
+            } else
+            ultima_data_possivel = (ptr->back()).data;
+            string primeira_data_possivel = (ptr->begin())->data;
+
             do {
                 if (repeat)
-                    cout << "\n\nInsira uma data valida!\n" << endl;
-                cout << "Entre com a data desejada no formato (DD/MM/AAAA): ";
+                    cout << "\nInsira uma data valida!\n" << endl;
+                cout << "Data mais antiga possivel (AAAA/MM/DD): " << primeira_data_possivel << endl;
+                cout << "Data mais recente possivel (AAAA/MM/DD): " << ultima_data_possivel << endl;
+                cout << "\nEntre com a data desejada no formato (DD/MM/AAAA): ";
                 cin >> data;
                 aux = textUntilDivision(data,1);
                 try {
@@ -585,12 +591,6 @@ class System { // Classe que vai gerir todo o sistema
                                 if (dia<10)
                                     data += "0";
                                 data += to_string(dia);
-
-                                auto it = ptr->end();
-                                for (int i=0;i<14;i++) {
-                                    it--;
-                                }
-                                string ultima_data_possivel = it->data;
 
                                 if ((ptr->begin())->data<=data && ultima_data_possivel>=data){
                                     repeat = false;
@@ -615,10 +615,14 @@ class System { // Classe que vai gerir todo o sistema
         int totalDeCasosObitos (int esc) {
             string data1, data2;
             int cont=0;
+
+            string ultima_data_possivel = (ptr->back()).data;
+            string primeira_data_possivel = (ptr->begin())->data;
+
             do {
                 if (cont)
-                    cout << "\nA data inicial nao pode ser maior que a data final!\n" << endl;
-                cout << "Insira as datas inicial e final, respectivamente, para a analise." << endl;
+                    cout << "\nA data inicial nao pode ser maior que a data final!" << endl;
+                cout << "\nInsira as datas inicial e final, respectivamente, para a analise." << endl;
                 data1=""; data2="";
                 data1 = lerData();
                 data2 = lerData();
@@ -761,6 +765,10 @@ class System { // Classe que vai gerir todo o sistema
 
             media = mediaMovel(casosObitos,janela,data);
             media_ant = mediaMovel(casosObitos,janela,data_ant);
+
+            cout << "Media movel mais recente: " << media 
+            << "\nMedia movel mais anterior: " << media_ant 
+            << "\nVariacao de " << 100*(1-(media/media_ant)) << "%\n" << endl;
             
             if (media/media_ant >= 1.15)
                 return 1;
